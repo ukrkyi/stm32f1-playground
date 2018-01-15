@@ -18,8 +18,39 @@ void USART3_IRQHandler(void)
 	USART3->DR = USART3->DR;
 }
 
+void SetSystemCoreClock(void)
+{
+	/* Set HSEON bit */
+	RCC->CR |= RCC_CR_HSEON;
+
+	// Wait for HSE to become ready
+	while (!(RCC->CR & RCC_CR_HSERDY));
+
+	// Configure PLL
+	RCC->CFGR |= RCC_CFGR_PLLMULL9 | RCC_CFGR_PLLSRC | RCC_CFGR_PPRE1_DIV2;
+
+	// Enable PLL
+	RCC->CR |= RCC_CR_PLLON;
+
+	// Wait for PLL to become ready
+	while (!(RCC->CR & RCC_CR_PLLRDY));
+
+	// Important: Set up latency & prefetch buffer before we speed up SYSCLK
+	FLASH->ACR = FLASH_ACR_PRFTBE | 0x2;
+
+	// Set PLL as the clock source
+	RCC->CFGR |= RCC_CFGR_SW_PLL;
+
+	// Wait for PLL to become clock source
+	while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
+
+	SystemCoreClockUpdate();
+}
+
 int main(void)
 {
+	SetSystemCoreClock();
+
 	// Port C led setup
 	RCC->APB2ENR |= RCC_APB2ENR_IOPCEN | RCC_APB2ENR_IOPBEN;
 	GPIOC->CRH |= GPIO_CRH_MODE13_1;
@@ -41,7 +72,7 @@ int main(void)
 
 	GPIOB->CRH |= GPIO_CRH_MODE10_1;
 	MODIFY_REG(GPIOB->CRH, GPIO_CRH_CNF10_Msk, GPIO_CRH_CNF10_1);
-	USART3->BRR = (3333 << USART_BRR_DIV_Mantissa_Pos) | 5; //150 for 8MHz clock
+	USART3->BRR = (3750 << USART_BRR_DIV_Mantissa_Pos); // 600 for 36MHz clock
 	USART3->CR1 |= USART_CR1_UE | USART_CR1_RE | USART_CR1_TE | USART_CR1_RXNEIE;
 	NVIC_EnableIRQ(USART3_IRQn);
 	//USART3->DR = 'a';
