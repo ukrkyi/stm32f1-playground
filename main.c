@@ -12,6 +12,12 @@ void EXTI9_5_IRQHandler(void)
 	}
 }
 
+void USART3_IRQHandler(void)
+{
+	USART3->SR &= ~(USART_SR_RXNE | USART_SR_ORE);
+	USART3->DR = USART3->DR;
+}
+
 int main(void)
 {
 	// Port C led setup
@@ -28,6 +34,17 @@ int main(void)
 
 	// NVIC Configuration
 	NVIC_EnableIRQ(EXTI9_5_IRQn);
+	
+	// USART setup
+	RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
+	RCC->APB1ENR |= RCC_APB1ENR_USART3EN;
+
+	GPIOB->CRH |= GPIO_CRH_MODE10_1;
+	MODIFY_REG(GPIOB->CRH, GPIO_CRH_CNF10_Msk, GPIO_CRH_CNF10_1);
+	USART3->BRR = (3333 << USART_BRR_DIV_Mantissa_Pos) | 5; //150 for 8MHz clock
+	USART3->CR1 |= USART_CR1_UE | USART_CR1_RE | USART_CR1_TE | USART_CR1_RXNEIE;
+	NVIC_EnableIRQ(USART3_IRQn);
+	//USART3->DR = 'a';
 
 	while (1) {
 		;
