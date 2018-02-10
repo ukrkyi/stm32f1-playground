@@ -7,9 +7,11 @@ OUT_FILE = app
 ifneq ($(lastword $(subst /, ,$(CURDIR))),obj)
 
 all:
+Makefile: ;
 %:
+	@echo "Building target $@…"
 	mkdir -p $(OBJDIR)
-	$(MAKE) -C $(OBJDIR) -f ../Makefile -$(MAKEFLAGS) "ROOTDIR=$(CURDIR)/" $(MAKECMDGOALS)
+	$(MAKE) -C $(OBJDIR) -f ../Makefile -$(MAKEFLAGS) "ROOTDIR=$(CURDIR)/" $@
 
 else
 
@@ -30,7 +32,6 @@ AS := $(COMPILER_DIR)/arm-none-eabi-as
 CP := $(COMPILER_DIR)/arm-none-eabi-objcopy
 
 DEFINES += -DSTM32F103xB
-DEFINES += -D__STARTUP_CLEAR_BSS -D__START=main
 
 INCFLAGS := $(addprefix -I ,$(INCDIR))
 
@@ -51,8 +52,11 @@ vpath %.h $(INCDIR)
 vpath %.o $(OBJDIR)
 vpath %.c $(SRCDIR)
 vpath %.s $(SRCDIR)
+vpath %.ld $(LINKDIR)
 
-.PHONY: clean build debug
+.PHONY: clean build debug all flash
+
+all: debug flash
 
 debug: CFLAGS += $(DEBUGFLAGS)
 debug: ASFLAGS+= -g3
@@ -64,7 +68,7 @@ build: $(OUT_FILE).bin
 %.bin: %.elf
 	$(CP) -O binary $< $@
 
-$(OUT_FILE).elf: startup_stm32f103xb.o $(OBJECTS) $(addprefix $(LINKDIR), $(LINKFILES))
+$(OUT_FILE).elf: startup_stm32f103xb.o $(OBJECTS) $(LINKFILES)
 	@echo "Linking files $(filter %.o,$^)…"
 	$(CC) $(LDFLAGS) $(filter %.o,$^) $(LDLIBS) -o $@
 
