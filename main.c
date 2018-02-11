@@ -14,8 +14,21 @@ void EXTI9_5_IRQHandler(void)
 
 void USART3_IRQHandler(void)
 {
-	USART3->SR &= ~(USART_SR_RXNE | USART_SR_ORE);
-	USART3->DR = USART3->DR;
+	uint16_t status = USART3->SR;
+	uint8_t data = USART3->DR;
+	if ((status & USART_SR_RXNE) && (status & USART_SR_TXE))
+	{
+		USART3->DR = data;
+	}
+}
+
+void USART3_Send(char * data)
+{
+	while (*data != '\0') {
+		while ((USART3->SR & USART_SR_TXE) == 0x0);
+		USART3->DR = *data;
+		++data;
+	}
 }
 
 void SetSystemCoreClock(void)
@@ -75,7 +88,8 @@ int main(void)
 	USART3->BRR = (3750 << USART_BRR_DIV_Mantissa_Pos); // 600 for 36MHz clock
 	USART3->CR1 |= USART_CR1_UE | USART_CR1_RE | USART_CR1_TE | USART_CR1_RXNEIE;
 	NVIC_EnableIRQ(USART3_IRQn);
-	//USART3->DR = 'a';
+
+	USART3_Send("Hello!\n");
 
 	while (1) {
 		;
