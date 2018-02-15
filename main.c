@@ -64,6 +64,15 @@ int main(void)
 {
 	SetSystemCoreClock();
 
+	// Set up LSE
+	RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+	PWR->CR |= PWR_CR_DBP;
+	/* Set LSEON bit */
+	RCC->BDCR |= RCC_BDCR_LSEON;
+
+	// Wait for LSE to become ready
+	while (!(RCC->BDCR & RCC_BDCR_LSERDY));
+
 	// Port C led setup
 	RCC->APB2ENR |= RCC_APB2ENR_IOPCEN | RCC_APB2ENR_IOPBEN;
 	GPIOC->CRH |= GPIO_CRH_MODE13_1;
