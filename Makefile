@@ -72,9 +72,6 @@ $(OUT_FILE).elf: startup_stm32f103xb.o $(OBJECTS) $(LINKFILES)
 	@echo "Linking files $(filter %.o,$^)…"
 	$(CC) $(LDFLAGS) $(filter %.o,$^) $(LDLIBS) -o $@
 
-system.o: system_stm32f1xx.c
-	$(CC) $(CPPFLAGS) $(CFLAGS) -c $< -o $@
-
 clean:
 	rm -rf $(addprefix $(ROOTDIR),*.o) $(OBJDIR)
 
