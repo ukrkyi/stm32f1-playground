@@ -7,13 +7,10 @@
 
 void button_state_change_callback()
 {
-	if (button_is_pressed())
-	{
+	if (button_is_pressed()) {
 		led_on();
 		uart_send("1");
-	}
-	else
-	{
+	} else {
 		led_off();
 		uart_send("0");
 	}
