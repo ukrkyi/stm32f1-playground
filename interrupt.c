@@ -10,6 +10,20 @@ void EXTI9_5_IRQHandler(void)
 	}
 }
 
+void SysTick_Handler(void)
+{
+	systick_callback();
+	indicator_tick();
+}
+
 __attribute__((weak)) void exti_line8_callback()
+{
+}
+
+__attribute__((weak)) void systick_callback()
+{
+}
+
+__attribute__((weak)) void indicator_tick()
 {
 }

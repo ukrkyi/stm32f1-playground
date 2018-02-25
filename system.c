@@ -31,3 +31,17 @@ void set_system_clock(void)
 
 	SystemCoreClockUpdate();
 }
+
+bool systick_init(uint32_t ticks, bool div8)
+{
+	if ((ticks - 1UL) > SysTick_LOAD_RELOAD_Msk)
+		return false;
+
+	SysTick->LOAD  = (uint32_t)(ticks - 1UL);
+	NVIC_SetPriority (SysTick_IRQn, (1UL << __NVIC_PRIO_BITS) - 1UL);
+	SysTick->VAL   = 0UL;
+	SysTick->CTRL  = (div8 ? 0 : SysTick_CTRL_CLKSOURCE_Msk) |
+			 SysTick_CTRL_TICKINT_Msk   |
+			 SysTick_CTRL_ENABLE_Msk;
+	return true;
+}

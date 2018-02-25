@@ -8,18 +8,6 @@
 #include <inttypes.h>
 
 static int max = 100;
-static char buff[100];
-
-void button_state_change_callback()
-{
-	if (button_is_pressed()) {
-		led_on();
-		uart_send("1");
-	} else {
-		led_off();
-		uart_send("0");
-	}
-}
 
 void encoder_step_callback(bool backward, int pos)
 {
@@ -28,6 +16,11 @@ void encoder_step_callback(bool backward, int pos)
 			max--;
 	} else if (max < 100)
 		max++;
+}
+
+void systick_callback()
+{
+	led_toggle();
 }
 
 int main(void)
@@ -43,6 +36,8 @@ int main(void)
 	led_rgb_setcolor(100, 100, 100);
 	encoder_init();
 	uart_init();
+
+	systick_init(9000000, true);
 
 	uart_send("Hello!\r\n");
 
@@ -67,7 +62,7 @@ int main(void)
 			if (j == 0)
 				up = true;
 		}
-		for (volatile k = 0; k < 200000; k++);
+		for (volatile int k = 0; k < 200000; k++);
 	}
 	return 0;
 }
