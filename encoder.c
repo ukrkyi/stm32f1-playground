@@ -1,5 +1,19 @@
 /* (c) 2018 ukrkyi */
 
+/*
+ * Pins used:
+ *	B6 ----> DT
+ *	B7 ----> CLK
+ *	B8 ----> SW
+ *
+ * Peripherals used:
+ *	TIM4 @ 72 MHz
+ *	- ARR = FULL_ROTATION
+ *	- CH 1-2, Encoder mode
+ *	EXTI
+ *	- Line 8 -> Port B
+ */
+
 #include "interrupt.h"
 #include "encoder.h"
 #include <stm32f1xx.h>

@@ -1,5 +1,14 @@
 /* (c) 2018 ukrkyi */
 
+/*
+ * Pins used:
+ *	B10 ---> TX
+ *	B11 ---> RX
+ *
+ * Peripherals used:
+ *	USART3 @ baudrate 600
+ */
+
 #include "uart.h"
 #include <stm32f1xx.h>
 #include <stddef.h>
@@ -18,7 +27,7 @@ void uart_init()
 	MODIFY_REG(GPIOB->CRH,
 		   GPIO_CRH_CNF10 | GPIO_CRH_MODE10 | GPIO_CRH_CNF11 | GPIO_CRH_MODE11,
 		   (0x3 << GPIO_CRH_MODE10_Pos) | (0x2 << GPIO_CRH_CNF10_Pos) | (0x1 << GPIO_CRH_CNF11_Pos));
-	USART3->BRR = 3750 << USART_BRR_DIV_Mantissa_Pos; // 600 for 36MHz clock
+	USART3->BRR = 3750 << USART_BRR_DIV_Mantissa_Pos; // 600 for 72MHz clock
 	SET_BIT(USART3->CR1,
 		USART_CR1_UE | USART_CR1_RE | USART_CR1_TE | USART_CR1_RXNEIE);
 	NVIC_EnableIRQ(USART3_IRQn);

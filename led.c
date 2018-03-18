@@ -1,4 +1,18 @@
 /* (c) 2018 ukrkyi */
+
+/*
+ * Pins used:
+ *	C13 ---> LED (on-board, active low)
+ *	A8 ----> R |
+ *	A9 ----> G |> RGB LED (common cathode connected to ground)
+ *	A10 ---> B |
+ *
+ * Peripherals used:
+ *	TIM1 @ 2 MHz / 100
+ *	- ARR = 99
+ *	- CH 1-3, PWM mode @ 20 kHz
+ */
+
 #include "led.h"
 #include <stm32f1xx.h>
 
