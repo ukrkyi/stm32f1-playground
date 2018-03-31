@@ -5,6 +5,6 @@
 #include <stdbool.h>
 
 extern void shift_init(int count);
-extern bool shift_set(uint16_t data);
+extern void shift_set(uint16_t data);
 
 #endif // SHIFT_H
