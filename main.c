@@ -3,7 +3,7 @@
 #include "interrupt.h"
 #include "uart.h"
 #include "system.h"
-#include "indicator.h"
+#include "display.h"
 #include <stm32f1xx.h>
 #include <stdio.h>
 #include <inttypes.h>
@@ -29,19 +29,25 @@ int main(void)
 {
 	set_system_clock();
 
-	systick_init(9000, true); // 1 tick per ms
+	display_init();
 
-	indicator_init();
-
-	int offset = 0, position;
+	int x;
 
 	while (1) {
-		position = 8;
-		for (int i = 0; i < sizeof(letters); i++)
-			position += indicator_putletter(letters[i], position - offset);
+		x = 0;
 
-		offset = (offset + 1) % position;
-		for (volatile int i = 0; i < 500000; i++);
+		for (int i = 0; i < sizeof(letters); i++) {
+			x += display_putletter(letters[i]);
+			for (volatile int j = 0; j < 500000; j++) ;
+			if (x > 500 || letters[i] == '\n') {
+				for (volatile int j = 0; j < 5000000; j++) ;
+				x = 0;
+				display_clear();
+			}
+		}
+
+		for (volatile int j = 0; j < 5000000; j++);
+		display_clear();
 	}
 	return 0;
 }
